@@ -1,0 +1,219 @@
+Como já tenho o Express instalado, só preciso chamar, então:
+    - express --ejs restaurante
+    -  cd restaurante
+    -  cd restaurante
+    -  npm install
+    -  SET DEBUG=restaurante:* &         npm start
+
+Vou na pasta 'admin', abro o prompt e:
+     - bower install
+
+Se já tiver instalado...
+
+Baixei o banco MySQL pelo link:
+https://www.mysql.com/downloads/
+
+Baixei tudo, ai pediu senha, eu coloquei: dorajesse1712
+
+E add user p esse banco, passando a senha mesma.
+
+Fui dando finish,e pronto, abriu.
+
+Criei novo banco chamado restaurante. 
+Agora se eu ir na pasta restaurante projeto -> restaurante -> public -> db
+
+Meu banco vai estar lá.
+
+Se quiser ver como controi um banco é só ir na aula 165 hcode
+
+Agora no terminal da pasta restqaurante baixo mysql2:
+
+   - npm install mysql2 --save
+
+Vou no site: https://www.npmjs.com/package/mysql2
+
+e procuro o First Query e copio: 
+// create the connection to database
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  database: 'restaurante',
+  password: 'dorajesse1712'
+}); 
+
+Agora abro a pasta restaurante no VSCode, crio uma pasta "inc" e um arq "db.js" e colo aquilo q copiei acima.
+
+Agora vou na pasta "routes" -> "users.js", pedir p ele pegar os dados do meu banco e me retornar um json simples. Pondo:
+var conn = require('./../inc/db');//chamo banco
+var express = require('express');
+var router = express.Router();
+
+/* GET users listing. */
+router.get('/', function(req, res, next) {
+  conn.query('SELECT * FROM tb_users ORDER BY name', (err, results) => {
+    if(err){
+      res.send(err);
+    } else {
+      res.send(results);
+    }
+  })
+});
+
+module.exports = router;
+
+
+Ta agora preciso do meu EJS. Então vou na pasta public -> index.html e copio all cód html.
+Ai vou na pasta views -> index.ejs e colo. Posso apagar o index.html
+
+No meu index.ejs na tag <title>aqui</title>
+
+aqui -> coloco: <% = title %>
+método de ASP
+
+Ai lá no index.js da pasta routes e passo no title o nome que quero, nesse caso "Restaurante saboroso".
+
+Agora preciso pegar o cardápio do banco de dados.
+Fui no index.js -> chamei o banco:
+
+var conn = require('./../inc/db');
+
+Ai, dentro da função, pedi oq queria e pedi pra mostrar na tela
+
+MAAAAS, preciso ir lá no meu index.ejs -> apago as minhas divs de pratos protos (que mostra os pratos) e deixo só uma
+
+E lá, vou colocando um "js" dentro do "html" p ir indicando oq quero que apareca, ex, antes da tag que abrange o prato, coloco:
+<% menus.forEach(function (row){ %>
+no final da tag div, fecho: <%})%>
+
+E nas tags, como img, p, etc.. coloco por ex:
+<img src="<%= row.photo %>" 
+
+Faço isso p preço, nome, titulo, enfim, o que tiver...
+
+Se quiser ver se ta funcionando vou no banco de dados e coloco na tela:
+SELECT * FROM restaurante.tb_menus
+
+e onde aparece o preço mais abaixo, posso mudar, e clicar no btn apply, volto no meu site , dou refresh e se carregar o preçio novo que inseri, deu certo.
+
+
+
+Pelo fato de sempre utilizar o mesmo pedaço de código e precisar mudar ele várias vezes, bora metodetealo kkkk....
+
+Na pasta views -> crio nova pasta -> inc -> e um arq head.ejs
+
+Vou la no meu index.ejs e copio all tag <head> e colo no head.ejs
+
+Volto no index.ejs e coloco EXATAMENTE no mesmo lugar onde tava a tag head o código:
+
+<%- include("inc/head")-%>
+
+
+
+Fui na pasta public recortei os arq: menu, reservation, services
+E colei na pasta view e renomeei todos e o contact com terminação .ejs
+
+
+Agora crio a rota desses outros arquivos no index.js, por ex:
+router.get('/reservations', function(req, res, next) {
+  res.render('reservations', {
+    title: 'Reservas - Restaurante Saboroso!'
+  });
+});
+
+p cada página eu faço um desse
+
+
+
+Agora peguei do index.ejs all tag <nav> recortei e criei na pasta views -> inc > o arq header-menu.ejs e colei all <nav> lá
+
+Fui mudando o href dos li, por ex:
+<a href="/services">Serviços</a> OK
+
+Nos arquivos:  services, reservations, menus e contacts, tirei a tag <nav> e <header> e pos:
+
+<%- include('inc/header-menu')-%>
+
+	<%- include('inc/header')-%>
+
+Dai na pasta views -> inc-> criei o arq header.ejs p por a tag <header>
+
+colocando <%%> onde é p ser automático
+
+Ai lá no index.js add essas vars, por exs:
+router.get('/contacts', function(req, res, next) {
+  res.render('contacts', {
+    title: 'Contatos - Restaurante Saboroso!',
+    background: 'images/img_bg_3.jpg',
+    h1: 'Diga um oi!'
+  });
+});
+
+router.get('/menus', function(req, res, next) {
+  res.render('menus', {
+    title: 'Menu - Restaurante Saboroso!',
+    background: 'images/img_bg_1.jpg',
+    h1: 'Saboreie nosso menu!'
+  });
+});
+
+OK
+
+
+Depois fiz mesmo processo de tirar o footer do index.ejs colocar no viwes -> inc p facilitar nossa vida.
+
+
+Agora, muitas partes se repetem no visual do site, mesmo esquema que acima, então vou pegar eles p por quando eu quiser. Componetizei all.
+
+
+
+
+Na parte do admin, preciso guardar o session, então vou no link
+https://www.npmjs.com/package/express-session
+
+instalo via prompt na pasta restaurante com o comando:
+
+  - npm install express-session connect-redis
+
+E dps maipulo qo tem p manipular.
+
+Sessão é uma ligação q exite entre uma usuário e um servidor, e uma info que eu preciso guardar, enquanto aquele usuario está ativo.
+
+Ex: eu quero as infos de tal url, mas ao abrir outra página, aquela info foi perdida, p isso nao ocorrer tem o session
+
+
+Tá, fiz agora vamos saber oq é um middle where:
+
+MiddleWhere -> são funções que tem acesso ao objeto de solicitação (req) e obj resposta (res) e a próxima função.
+
+Executam qualquer código, fazer mudanças nos objetos de solicitação e resposta, encerrar ciclo de respota e chamar a próxima função na pilha.
+
+E isso que fiz no Session, por ex no app.js, onde coloquei todos meus app.use().
+
+--------------------------------------------------------------
+
+Instalei um comando de:
+  - npm install formidable --save
+
+--------------------------------------------------------------
+
+Instalei comando, que vem do site:
+https://momentjs.com/
+
+  - npm install moment --save
+
+
+Instalaei tbm o Chart:
+Acessei a pasta C:\Users\Helen Lazarotti\Desktop\Restaurante-Projeto\restaurante\public\admin> p instalar
+
+   - bower install chart.js --save
+
+
+Baixando o Socket.io:
+P isso tive q desistal o express via prompt:
+   - npm uninstall express --save
+
+E instalar sua versão:
+  - npm install --save express@4.15.2
+
+Agora instalo o coscret:
+   - npm install socket.io --save
